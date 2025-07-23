@@ -1,13 +1,14 @@
-const crypto = require('crypto');
-const { promisify } = require('util');
-const jwt = require('jsonwebtoken');
-const User = require('../models/User');
-const catchAsync = require('../utils/catchAsync');
-const AppError = require('../utils/appError');
-const Email = require('../utils/email');
+import { createHash } from 'crypto';
+import { promisify } from 'util';
+import { sign, verify } from 'jsonwebtoken';
+import { create, findOne, findById } from '../models/User';
+import catchAsync from '../utils/catchAsync';
+import AppError from '../utils/appError';
+import Email from '../utils/email';
+import process from 'process';
 
 const signToken = id =>
-	jwt.sign({ id }, process.env.JWT_SECRET, {
+	sign({ id }, process.env.JWT_SECRET, {
 		expiresIn: process.env.JWT_EXPIRATION,
 	});
 
@@ -34,9 +35,9 @@ const createSendToken = (user, statusCode, res) => {
 	});
 };
 
-exports.signup = catchAsync(async (req, res, next) => {
+export const signup = catchAsync(async (req, res, next) => {
 	// Get user data from the request body
-	const newUser = await User.create({
+	const newUser = await create({
 		name: req.body.name,
 		email: req.body.email,
 		password: req.body.password,
@@ -51,7 +52,7 @@ exports.signup = catchAsync(async (req, res, next) => {
 	createSendToken(newUser, 201, res);
 });
 
-exports.login = catchAsync(async (req, res, next) => {
+export const login = catchAsync(async (req, res, next) => {
 	const { email, password } = req.body;
 
 	// 1. Check if email and password exist
@@ -59,7 +60,7 @@ exports.login = catchAsync(async (req, res, next) => {
 		return next(new AppError('Please provide an email and password.', 400));
 
 	// 2. Check if email and password are valid
-	const user = await User.findOne({ email }).select('+password');
+	const user = await findOne({ email }).select('+password');
 
 	if (!user || !(await user.correctPassword(password, user.password)))
 		return next(new AppError('Incorrect email or password.', 401));
@@ -68,7 +69,7 @@ exports.login = catchAsync(async (req, res, next) => {
 	createSendToken(user, 200, res);
 });
 
-exports.logout = (req, res) => {
+export function logout(req, res) {
 	// Jonas method
 	// res.cookie('jwt', 'loggedOut', {
 	// 	expires: new Date(Date.now() + 10 * 1000),
@@ -79,9 +80,9 @@ exports.logout = (req, res) => {
 	res.clearCookie('jwt');
 
 	res.status(200).json({ status: 'success' });
-};
+}
 
-exports.protect = catchAsync(async (req, res, next) => {
+export const protect = catchAsync(async (req, res, next) => {
 	// 1. Get token and confirm it exists
 	let token;
 	if (
@@ -99,10 +100,10 @@ exports.protect = catchAsync(async (req, res, next) => {
 		);
 
 	// 2. Verify token (2 errors possible - invalid and expired tokens)
-	const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
+	const decoded = await promisify(verify)(token, process.env.JWT_SECRET);
 
 	// 3. Check if user still exists
-	const currentUser = await User.findById(decoded.id);
+	const currentUser = await findById(decoded.id);
 	if (!currentUser)
 		return next(
 			new AppError('The user with this access token does no longer exist.', 401)
@@ -124,17 +125,17 @@ exports.protect = catchAsync(async (req, res, next) => {
 	next();
 });
 
-exports.isLoggedIn = async (req, res, next) => {
+export async function isLoggedIn(req, res, next) {
 	// 1. Verify cookies
 	if (req.cookies.jwt) {
 		try {
-			const decoded = await promisify(jwt.verify)(
+			const decoded = await promisify(verify)(
 				req.cookies.jwt,
 				process.env.JWT_SECRET
 			);
 
 			// 2. Check if user still exists
-			const currentUser = await User.findById(decoded.id);
+			const currentUser = await findById(decoded.id);
 			if (!currentUser) return next();
 
 			// 3. Check if user changed password after token was issued
@@ -151,11 +152,10 @@ exports.isLoggedIn = async (req, res, next) => {
 	}
 
 	return next();
-};
+}
 
-exports.restrictTo =
-	(...roles) =>
-	(req, res, next) => {
+export function restrictTo(...roles) {
+	return (req, res, next) => {
 		if (!roles.includes(req.user.role)) {
 			return next(
 				new AppError(
@@ -166,10 +166,11 @@ exports.restrictTo =
 		}
 		next();
 	};
+}
 
-exports.forgotPassword = catchAsync(async (req, res, next) => {
+export const forgotPassword = catchAsync(async (req, res, next) => {
 	// 1. Check if user email exists
-	const user = await User.findOne({ email: req.body.email });
+	const user = await findOne({ email: req.body.email });
 
 	if (!user)
 		return next(new AppError('There is no user with that email.', 404));
@@ -198,14 +199,13 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
 	}
 });
 
-exports.resetPassword = catchAsync(async (req, res, next) => {
+export const resetPassword = catchAsync(async (req, res, next) => {
 	// 1. Find user based on reset token
-	const hashedToken = crypto
-		.createHash('sha256')
+	const hashedToken = createHash('sha256')
 		.update(req.params.token)
 		.digest('hex');
 
-	const user = await User.findOne({
+	const user = await findOne({
 		passwordResetToken: hashedToken,
 		passwordResetExpires: { $gt: Date.now() },
 	});
@@ -228,9 +228,9 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
 	createSendToken(user, 200, res);
 });
 
-exports.updatePassword = catchAsync(async (req, res, next) => {
+export const updatePassword = catchAsync(async (req, res, next) => {
 	// 1. Find user in collection
-	const user = await User.findById(req.user.id).select('+password');
+	const user = await findById(req.user.id).select('+password');
 	if (!user) return next(new AppError('No user found!', 404));
 
 	// 2. Confirm current password
