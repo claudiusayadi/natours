@@ -7,14 +7,11 @@ import { Tour } from '../modules/tours/entities/tour.entity';
 import { User } from '../modules/users/entities/user.entity';
 import { ApiConfig } from './env.validation';
 
-export const createDataSource = () => {
+export const createDataSource = (): DataSourceOptions &
+  TypeOrmModuleOptions => {
   const dbOptions = {
     type: 'postgres',
-    host: ApiConfig.DB_HOST,
-    port: ApiConfig.DB_PORT,
-    username: ApiConfig.DB_USERNAME,
-    password: encodeURIComponent(ApiConfig.DB_PASSWORD),
-    database: ApiConfig.DB_NAME,
+    url: ApiConfig.DB_URL,
     entities: [User, Tour, Review, Booking],
     migrations: ['src/db/migrations/*.ts'],
     synchronize: ApiConfig.NODE_ENV === 'development',
