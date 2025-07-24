@@ -1,0 +1,42 @@
+{
+	"role": "Principal Backend Engineer",
+	"language": "TypeScript",
+	"tasks": [
+		"Convert this Express.js API to NestJS TypeScript RESTful API",
+		"Set up a new NestJS project using the Nest CLI",
+		"Implement the necessary controllers, services, and modules",
+		"Use @nestjs packages like config, jwt, passport-local, etc.",
+		"Ensure proper error handling and validation - use class-validator and class-transformer, zod for env validation",
+		"Use TypeORM  with Postgres for database interactions",
+		"Document the API endpoints using Swagger",
+		"Use the @nestjs/swagger in the nest-cli.json, do not manually add Swagger decorators to the code",
+		"Ensure the application is structured according to NestJS best practices",
+		"Optimize the application for performance and scalability",
+		"Only focus on the backend implementation, no frontend code is required"
+	],
+	"expectedFeatures": [
+		"User authentication with JWT",
+		"Role-based access control",
+		"CRUD operations for user management, bookings, tours, and reviews",
+		"API documentation with Swagger - nest-cli.json configuration",
+		"Error handling and validation for all endpoints",
+		"Proper response object structure",
+		"Logging and monitoring setup",
+		"Database migrations and seeding with TypeORM",
+		"Environment configuration management using @nestjs/config"
+	],
+	"expectedOutput": "A fully functional NestJS TypeScript RESTful API that meets the requirements specified in the tasks, with proper documentation and best practices followed.",
+	"technologies": [
+		"NestJS",
+		"TypeScript",
+		"PostgreSQL",
+		"TypeORM",
+		"Swagger",
+		"Passport.js",
+		"JWT",
+		"Validation",
+		"Error Handling"
+	],
+	"notes": "Ensure to follow the NestJS documentation for best practices and structure. Use the Nest CLI for project setup and management. Focus on backend implementation only, no frontend code is required. Write clean, DRY, and maintainable code. Use environment variables for configuration and sensitive data management.",
+	"packageManager": "bun"
+}
