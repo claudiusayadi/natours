@@ -1,19 +1,17 @@
 import * as argon from 'argon2';
 import { TourDifficulty } from '../../common/enums/tour-difficulty.enum';
 import { UserRole } from '../../common/enums/user-role.enum';
-import { AppDataSource } from '../../config/db.config';
-import { Tour } from '../../modules/tours/entities/tour.entity';
-import { User } from '../../modules/users/entities/user.entity';
+import dataSource from '../../config/data-source';
 
 async function seed() {
-  const dataSource = AppDataSource;
+  const apiDataSource = dataSource;
 
-  await dataSource.initialize();
+  await apiDataSource.initialize();
 
   console.log('🌱 Starting database seeding...');
 
   // Create users
-  const userRepo = dataSource.getRepository(User);
+  const userRepo = apiDataSource.getRepository('User');
 
   const adminUser = userRepo.create({
     firstName: 'Admin',
@@ -44,7 +42,7 @@ async function seed() {
   // @TODO: Update users {firstName, lastName, role, photo - admin.jpg, lead-guide.jpg, guide.jpg, user.jpg}
 
   // Create tours
-  const tourRepository = dataSource.getRepository(Tour);
+  const tourRepository = apiDataSource.getRepository('Tour');
 
   const tour1 = tourRepository.create({
     name: 'The Forest Hiker',
@@ -135,7 +133,7 @@ async function seed() {
   await tourRepository.save([tour1, tour2]);
   console.log('✅ Tours created');
 
-  await dataSource.destroy();
+  await apiDataSource.destroy();
   console.log('🎉 Database seeding completed!');
 }
 

@@ -93,7 +93,7 @@ export class Tour {
   @Column('jsonb', { name: 'start_location' })
   startLocation: Location;
 
-  @Column('jsonb', { array: true, default: '{}' })
+  @Column('jsonb', { default: '[]' })
   locations: Location[];
 
   @CreateDateColumn({ name: 'created_at' })
@@ -118,7 +118,7 @@ export class Tour {
 
   @BeforeInsert()
   @BeforeUpdate()
-  generateSlug() {
+  slugify() {
     if (this.name) {
       this.slug = this.name
         .toLowerCase()

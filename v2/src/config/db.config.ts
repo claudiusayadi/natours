@@ -1,15 +1,12 @@
-import 'dotenv/config';
-import { DataSource } from 'typeorm';
-import { Booking } from '../modules/bookings/entities/booking.entity';
-import { Review } from '../modules/reviews/entities/review.entity';
-import { Tour } from '../modules/tours/entities/tour.entity';
-import { User } from '../modules/users/entities/user.entity';
+import { registerAs } from '@nestjs/config';
+import { TypeOrmModuleOptions } from '@nestjs/typeorm';
+import { ApiConfig } from './env.validation';
 
-export const AppDataSource = new DataSource({
-  type: 'postgres',
-  url: process.env.DB_URL,
-  entities: [User, Tour, Review, Booking],
-  migrations: ['src/db/migrations/*.ts'],
-  synchronize: process.env.NODE_ENV === 'development',
-  logging: false,
+export default registerAs('db', () => {
+  const config = {
+    type: 'postgres',
+    url: ApiConfig.DB_URL,
+    autoLoadEntities: true,
+  } as const satisfies TypeOrmModuleOptions;
+  return config;
 });

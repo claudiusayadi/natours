@@ -1,0 +1,15 @@
+{
+	"sqltools.connections": [
+		{
+			"previewLimit": 50,
+			"server": "localhost",
+			"port": 5432,
+			"driver": "PostgreSQL",
+			"name": "local",
+			"group": "nestjs",
+			"database": "natours",
+			"username": "postgres",
+			"password": "DfpPOWJFL2Ef+cJuE64pEsZNonp3fVls8j43qWLjyhw="
+		}
+	]
+}

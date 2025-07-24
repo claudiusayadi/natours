@@ -53,7 +53,7 @@ export class AuthService {
   async changePassword(user: User, changePasswordDto: ChangePasswordDto) {
     const dbUser = await this.usersService.findByWithPassword(user.id, 'id');
 
-    if (!(await dbUser.compare(changePasswordDto.passwordCurrent)))
+    if (!(await dbUser?.compare(changePasswordDto.passwordCurrent)))
       throw new UnauthorizedException('Current password is incorrect');
 
     await this.usersService.updatePassword(user.id, changePasswordDto.password);

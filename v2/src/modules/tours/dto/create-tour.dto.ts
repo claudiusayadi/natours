@@ -13,21 +13,41 @@ import {
 import { TourDifficulty } from '../../../common/enums/tour-difficulty.enum';
 
 class LocationDto {
+  /**
+   * Location type, must be 'Point'
+   * @example "Point"
+   */
   @IsString()
   type: 'Point';
 
+  /**
+   * Coordinates in [longitude, latitude] format
+   * @example [7.123456, 5.123456]
+   */
   @IsArray()
   @IsNumber({}, { each: true })
   coordinates: [number, number];
 
+  /**
+   * Optional address for the location
+   * @example "Idanre Hills, Ondo State, Nigeria"
+   */
   @IsString()
   @IsOptional()
   address?: string;
 
+  /**
+   * Optional description of the location
+   * @example "A beautiful hill with rich cultural heritage."
+   */
   @IsString()
   @IsOptional()
   description?: string;
 
+  /**
+   * Optional day of the tour this location is associated with
+   * @example 1
+   */
   @IsNumber()
   @IsOptional()
   day?: number;

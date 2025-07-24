@@ -20,25 +20,26 @@ export class User {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ name: 'first_name' })
-  firstName: string;
+  @Column({ name: 'first_name', nullable: true })
+  firstName?: string;
 
-  @Column({ name: 'last_name' })
-  lastName: string;
+  @Column({ name: 'last_name', nullable: true })
+  lastName?: string;
 
   @Column({ unique: true })
   email: string;
 
-  @Column({ default: 'default.jpg' })
-  photo: string;
+  @Column({ default: 'default.jpg', nullable: true })
+  photo?: string;
 
   @Column({
     type: 'enum',
     enum: UserRole,
     enumName: 'role',
     default: UserRole.USER,
+    nullable: true,
   })
-  role: UserRole;
+  role?: UserRole;
 
   @Column()
   @Exclude()
@@ -46,15 +47,15 @@ export class User {
 
   @Column({ name: 'password_changed_at', nullable: true })
   @Exclude()
-  passwordChangedAt: Date;
+  passwordChangedAt?: Date;
 
   @Column({ name: 'password_reset_token', nullable: true })
   @Exclude()
-  passwordResetToken: string;
+  passwordResetToken?: string;
 
   @Column({ name: 'password_reset_expires', nullable: true })
   @Exclude()
-  passwordResetExpires: Date;
+  passwordResetExpires?: Date;
 
   @Column({ default: true })
   @Exclude()
@@ -81,7 +82,9 @@ export class User {
   }
 
   async compare(password: string): Promise<boolean> {
-    return await argon.verify(password, this.password);
+    if (!this.password) throw new Error('User password hash is missing');
+    if (!password) throw new Error('Password to compare is missing');
+    return await argon.verify(this.password, password);
   }
 
   changedPasswordAfter(JWTTimestamp: number): boolean {

@@ -77,7 +77,7 @@ export class TourQueryDto {
 
   /**
    * Filter by maximum price
-   * @example 50,000
+   * @example 50000
    */
   @IsOptional()
   @Type(() => String)

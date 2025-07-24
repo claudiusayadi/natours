@@ -1,5 +1,8 @@
-import 'dotenv/config';
+import * as dotenv from 'dotenv';
+import * as dotenvExpand from 'dotenv-expand';
 import { z } from 'zod';
+
+dotenvExpand.expand(dotenv.config());
 
 export const envSchema = z.object({
   NODE_ENV: z
@@ -8,14 +11,7 @@ export const envSchema = z.object({
   PORT: z.coerce.number().default(4020),
   API_PREFIX: z.string().min(1, 'API_PREFIX is required!'),
 
-  // DB_TYPE: z.string().min(1, 'DB_TYPE is required!'),
-  // DB_USERNAME: z.string().min(1, 'DB_USERNAME is required!'),
-  // DB_PASSWORD: z.string().min(1, 'DB_PASSWORD is required!'),
-  // DB_HOST: z.string().min(1, 'DB_HOST is required!'),
-  // DB_PORT: z.coerce.number().min(1, 'DB_PORT is required!'),
-  // DB_NAME: z.string().min(1, 'DB_NAME is required!'),
-
-  DB_URL: z.url().min(1, 'DB_URL is required!'),
+  DB_URL: z.string().min(1, 'DB_URL is required!'),
 
   JWT_SECRET: z.string(),
   JWT_TTL: z.coerce.number().min(1, 'JWT_TTL is required!'),

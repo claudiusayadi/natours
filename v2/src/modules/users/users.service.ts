@@ -34,12 +34,17 @@ export class UsersService {
     return user;
   }
 
-  async findByWithPassword(identifier: string, name: string): Promise<User> {
-    const user = await this.usersRepo.findOneOrFail({
-      where: [
-        { id: identifier, active: true },
-        { email: identifier, active: true },
-      ],
+  async findByWithPassword(
+    identifier: string,
+    name: 'id' | 'email',
+  ): Promise<User | null> {
+    const where =
+      name === 'id'
+        ? { id: identifier, active: true }
+        : { email: identifier, active: true };
+
+    const user = await this.usersRepo.findOne({
+      where,
       select: {
         id: true,
         firstName: true,
@@ -53,10 +58,7 @@ export class UsersService {
       },
     });
 
-    if (!user)
-      throw new NotFoundException(`User with ${name} ${identifier} not found`);
-
-    return user;
+    return user ?? null;
   }
 
   async update(id: string, dto: UpdateUserDto): Promise<User> {
